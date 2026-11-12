@@ -49,14 +49,40 @@ export function Navbar({ onOpenCommand }: NavbarProps) {
   return (
     <header className="fixed top-0 inset-x-0 z-40 border-b border-white/10 bg-[#07070a]/90 backdrop-blur-2xl">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-        {/* Brand / Monogram */}
+        {/* Brand Logo (Neural Node M) */}
         <a
           href="#home"
           onClick={() => setMobileMenuOpen(false)}
           className={`flex min-h-[44px] items-center gap-3 rounded-lg px-1 text-sm font-semibold tracking-tight text-white group ${focusRing}`}
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 font-mono text-sm font-bold text-indigo-300 transition-colors group-hover:bg-indigo-500 group-hover:text-white">
-            MC
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-500/45 bg-[#10101d] transition-all group-hover:border-indigo-400 group-hover:bg-indigo-500/15 group-hover:shadow-[0_0_16px_rgba(99,102,241,0.3)]">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 36 36"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 25V12L18 20L26 12V25"
+                stroke="#818cf8"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="10" cy="12" r="2.4" fill="#ffffff" />
+              <circle
+                cx="18"
+                cy="20"
+                r="2.6"
+                fill="#6366f1"
+                stroke="#ffffff"
+                strokeWidth="1.2"
+              />
+              <circle cx="26" cy="12" r="2.4" fill="#ffffff" />
+              <circle cx="10" cy="25" r="2.1" fill="#818cf8" />
+              <circle cx="26" cy="25" r="2.1" fill="#818cf8" />
+            </svg>
           </div>
           <span className="text-base font-semibold text-white">
             {portfolioData.personal.name}
