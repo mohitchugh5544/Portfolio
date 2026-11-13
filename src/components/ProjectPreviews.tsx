@@ -18,118 +18,220 @@ import {
 
 /**
  * Full-height, vertically centered mock for Fitness+ Vision
- * with an enlarged, legible skeletal pose graphic and telemetry readouts.
+ * with real video playback (if provided) or skeletal pose graphic, plus telemetry readouts.
  */
-export function FitnessVisionMock() {
+export function FitnessVisionMock({ videoUrl }: { videoUrl?: string }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lightboxOpen]);
+
   return (
-    <div className="flex h-full w-full flex-col justify-center rounded-xl border border-white/10 bg-[#090910] p-5 sm:p-6">
-      {/* Top Window Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3.5">
-        <div className="flex items-center gap-2.5">
-          <Activity className="h-4 w-4 text-indigo-400 shrink-0" />
-          <span className="text-sm font-medium text-white">
-            Fitness+ Vision · Real-Time Pose Studio
-          </span>
-        </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-sm font-medium text-emerald-300">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          30 FPS Live
-        </span>
-      </div>
-
-      {/* Enlarged Skeleton Visual + Legible Labels */}
-      <div className="my-4 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-[#06060b] px-4 py-5">
-        <svg
-          viewBox="0 0 260 190"
-          className="h-52 w-full max-w-[300px] overflow-visible"
-          role="img"
-          aria-label="Biomechanical skeletal tracking diagram showing Shoulder 164 degrees, Hip 88.1 degrees, and Knee 92.4 degrees"
-        >
-          {/* Floor baseline */}
-          <line
-            x1="20"
-            y1="172"
-            x2="240"
-            y2="172"
-            stroke="rgba(255,255,255,0.14)"
-            strokeWidth="1.5"
-          />
-
-          {/* Knee angle guide arc */}
-          <path
-            d="M 105 112 A 22 22 0 0 1 112 142"
-            fill="none"
-            stroke="rgba(129, 140, 248, 0.75)"
-            strokeWidth="2"
-            strokeDasharray="4 4"
-          />
-
-          {/* Skeletal Bones */}
-          <polyline
-            fill="none"
-            stroke="#6366f1"
-            strokeWidth="4.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            points="92,24 84,62 56,108 118,124 90,168"
-          />
-
-          {/* Keypoints & Legible Labels */}
-          {[
-            { x: 92, y: 24, label: "Head", lx: 112, ly: 28 },
-            { x: 84, y: 62, label: "Shoulder 164°", lx: 104, ly: 66 },
-            { x: 56, y: 108, label: "Hip 88.1°", lx: 76, ly: 104 },
-            { x: 118, y: 124, label: "Knee 92.4°", lx: 136, ly: 128 },
-            { x: 90, y: 168, label: "Ankle 79°", lx: 110, ly: 168 },
-          ].map((pt, idx) => (
-            <g key={idx}>
-              <circle
-                cx={pt.x}
-                cy={pt.y}
-                r="7.5"
-                className="fill-indigo-500/30 stroke-indigo-400"
-                strokeWidth="2"
-              />
-              <circle cx={pt.x} cy={pt.y} r="3" className="fill-white" />
-              <text
-                x={pt.lx}
-                y={pt.ly}
-                fill="#e4e4e7"
-                fontSize="13.5"
-                fontWeight="500"
-                fontFamily="monospace"
+    <>
+      <div className="flex h-full w-full flex-col justify-between rounded-xl border border-white/10 bg-[#090910] p-4 sm:p-5">
+        {/* Top Window Header */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div className="flex items-center gap-2.5">
+            <Activity className="h-4 w-4 text-indigo-400 shrink-0" />
+            <span className="text-sm font-medium text-white">
+              Fitness+ Vision · Real-Time Pose Studio
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              30 FPS Live
+            </span>
+            {videoUrl && (
+              <button
+                type="button"
+                onClick={() => setLightboxOpen(true)}
+                aria-label="Expand demo video"
+                title="Expand video preview"
+                className="text-zinc-400 hover:text-white transition-colors"
               >
-                {pt.label}
-              </text>
-            </g>
-          ))}
-        </svg>
+                <Maximize2 className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Center: Real Video Recording OR Enlarged Skeleton Visual */}
+        {videoUrl ? (
+          <div
+            onClick={() => setLightboxOpen(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLightboxOpen(true);
+              }
+            }}
+            aria-label="Zoom Fitness+ Vision demo recording"
+            className="group relative my-auto my-3 flex cursor-zoom-in items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#06060b] shadow-2xl transition-all hover:border-indigo-500/50"
+          >
+            <video
+              src={videoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Fitness+ Vision demo recording"
+              className="aspect-[1888/938] w-full h-auto object-contain"
+            />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-zinc-950/80 px-3 py-1 text-xs font-medium text-zinc-100 shadow-lg">
+                <Maximize2 className="h-3.5 w-3.5 text-indigo-400" />
+                Click to expand
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="my-4 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-[#06060b] px-4 py-5">
+            <svg
+              viewBox="0 0 260 190"
+              className="h-52 w-full max-w-[300px] overflow-visible"
+              role="img"
+              aria-label="Biomechanical skeletal tracking diagram showing Shoulder 164 degrees, Hip 88.1 degrees, and Knee 92.4 degrees"
+            >
+              {/* Floor baseline */}
+              <line
+                x1="20"
+                y1="172"
+                x2="240"
+                y2="172"
+                stroke="rgba(255,255,255,0.14)"
+                strokeWidth="1.5"
+              />
+
+              {/* Knee angle guide arc */}
+              <path
+                d="M 105 112 A 22 22 0 0 1 112 142"
+                fill="none"
+                stroke="rgba(129, 140, 248, 0.75)"
+                strokeWidth="2"
+                strokeDasharray="4 4"
+              />
+
+              {/* Skeletal Bones */}
+              <polyline
+                fill="none"
+                stroke="#6366f1"
+                strokeWidth="4.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points="92,24 84,62 56,108 118,124 90,168"
+              />
+
+              {/* Keypoints & Legible Labels */}
+              {[
+                { x: 92, y: 24, label: "Head", lx: 112, ly: 28 },
+                { x: 84, y: 62, label: "Shoulder 164°", lx: 104, ly: 66 },
+                { x: 56, y: 108, label: "Hip 88.1°", lx: 76, ly: 104 },
+                { x: 118, y: 124, label: "Knee 92.4°", lx: 136, ly: 128 },
+                { x: 90, y: 168, label: "Ankle 79°", lx: 110, ly: 168 },
+              ].map((pt, idx) => (
+                <g key={idx}>
+                  <circle
+                    cx={pt.x}
+                    cy={pt.y}
+                    r="7.5"
+                    className="fill-indigo-500/30 stroke-indigo-400"
+                    strokeWidth="2"
+                  />
+                  <circle cx={pt.x} cy={pt.y} r="3" className="fill-white" />
+                  <text
+                    x={pt.lx}
+                    y={pt.ly}
+                    fill="#e4e4e7"
+                    fontSize="13.5"
+                    fontWeight="500"
+                    fontFamily="monospace"
+                  >
+                    {pt.label}
+                  </text>
+                </g>
+              ))}
+            </svg>
+          </div>
+        )}
+
+        {/* Bottom Readout Strip */}
+        <div className="grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
+            <div className="text-xs text-zinc-400">Exercises</div>
+            <div className="mt-0.5 font-mono text-xs font-semibold text-white truncate">
+              Squat · Curl · Push-up
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
+            <div className="text-xs text-zinc-400">Landmarks</div>
+            <div className="mt-0.5 font-mono text-xs font-semibold text-white">
+              33 Keypoints
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
+            <div className="text-xs text-zinc-400">Speed</div>
+            <div className="mt-0.5 font-mono text-xs font-semibold text-emerald-400">
+              30 FPS Live
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom Readout Strip */}
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5">
-          <div className="text-sm text-zinc-300">Exercises</div>
-          <div className="mt-0.5 font-mono text-sm font-semibold text-white">
-            Squat · Curl · Push-up
-          </div>
-        </div>
+      {/* Lightbox Modal for Fullscreen Inspection */}
+      {lightboxOpen && videoUrl && (
+        <div
+          onClick={() => setLightboxOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Fitness+ Vision demo recording fullscreen preview"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex max-h-[92vh] w-full max-w-5xl flex-col items-center gap-3"
+          >
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close preview"
+              className="absolute -top-3 -right-3 z-30 rounded-full border border-white/20 bg-zinc-900 p-2 text-zinc-200 shadow-xl transition-colors hover:bg-zinc-800 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5">
-          <div className="text-sm text-zinc-300">Landmarks</div>
-          <div className="mt-0.5 font-mono text-sm font-semibold text-white">
-            33 Keypoints
-          </div>
-        </div>
+            <div className="relative w-full overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+              <video
+                src={videoUrl}
+                autoPlay
+                controls
+                loop
+                playsInline
+                className="w-full h-auto aspect-[1888/938] object-contain"
+              />
+            </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5">
-          <div className="text-sm text-zinc-300">Speed</div>
-          <div className="mt-0.5 font-mono text-sm font-semibold text-white">
-            30 FPS Real-Time
+            <div className="rounded-full border border-white/10 bg-zinc-900/90 px-4 py-1.5 text-xs text-zinc-200">
+              <span className="font-mono font-semibold text-indigo-400">
+                Fitness+ Vision
+              </span>{" "}
+              · Real-Time Kinematics &amp; Pose Analysis
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 

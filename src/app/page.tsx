@@ -280,9 +280,15 @@ export default function PortfolioPage() {
                     )}
                   </div>
 
-                  {/* Right Column: Video Recording (if provided), Image, or Full-Height Mock */}
+                  {/* Right Column: Video Recording, Image, or Full-Height Mock */}
                   <div className="lg:col-span-6 flex h-full">
-                    {project.videoUrl ? (
+                    {project.previewType === "fitness-vision" ? (
+                      <FitnessVisionMock videoUrl={project.videoUrl} />
+                    ) : project.previewType === "jarvis-hud" ? (
+                      <JarvisHudMock />
+                    ) : project.previewType === "web-storefront" ? (
+                      <WebStorefrontMock images={project.images} />
+                    ) : project.videoUrl ? (
                       <video
                         src={project.videoUrl}
                         autoPlay
@@ -293,12 +299,6 @@ export default function PortfolioPage() {
                         aria-label={`${project.title} demo recording`}
                         className="h-full w-full rounded-xl border border-white/10 object-cover"
                       />
-                    ) : project.previewType === "fitness-vision" ? (
-                      <FitnessVisionMock />
-                    ) : project.previewType === "jarvis-hud" ? (
-                      <JarvisHudMock />
-                    ) : project.previewType === "web-storefront" ? (
-                      <WebStorefrontMock images={project.images} />
                     ) : project.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

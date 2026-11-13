@@ -73,7 +73,7 @@ export const fitnessPlusVision = {
   ],
   liveUrl: "", // TODO: deployed demo URL. The Live Demo button stays hidden while empty.
   githubUrl: "https://github.com/mohitchugh5544/Fitness-Vision",
-  videoUrl: "", // TODO: e.g. "/videos/fitness.mp4" (under 10s, muted, under 3 MB)
+  videoUrl: "/videos/fitness.mp4",
   previewType: "fitness-vision",
   metrics: [
     { label: "Pose landmarks", value: "33 (MediaPipe)" },
